@@ -97,16 +97,43 @@ def create_drink():
 
 
 '''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
+@TODO 
+    it should require the 'patch:drinks' permission
 '''
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+def update_drink(drink_id):
+    '''
+    Updates the drink if it exists, otherwise returns a 404 error.
+    
+    :param drink_id: Existing drink model id.
+    :returns: status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
+        or appropriate status code indicating reason for failure
+    '''
+    drink = Drink.query.get(drink_id)
+    
+    if not drink:
+        abort(404)
+        
+    data = request.get_json()
+    
+    try:
+        title = data['title']
+        recipe = data['recipe']
+    except KeyError:
+        abort(400)
+        
+    try:
+        drink.title = title
+        drink.recipe = recipe
+        
+        drink.update()
+    except:
+        abort(400)
+        
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long()]
+    })
 
 
 '''
