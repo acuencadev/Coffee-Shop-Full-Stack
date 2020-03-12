@@ -61,14 +61,39 @@ def get_drinks_detail():
 
 
 '''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
+@TODO
+    it should require the 'post:drinks' permission
 '''
+@app.route('/drinks', methods=['POST'])
+def create_drink():
+    '''
+    Create a new drink in the drinks table.
+    
+    :returns: status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
+        or appropriate status code indicating reason for failure
+    '''
+    data = request.get_json()
+
+    try:
+        title = data['title']
+        recipe = data['recipe']
+    except:
+        abort(400)
+
+    if not title or not recipe:
+        abort(400)
+    
+    new_drink = Drink(title=title, recipe=recipe)
+
+    try:
+        new_drink.insert()
+    except:
+        abort(400)
+
+    return jsonify({
+        'success': True,
+        'drinks': [new_drink.long()]
+    })
 
 
 '''
