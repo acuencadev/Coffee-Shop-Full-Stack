@@ -24,7 +24,7 @@ CORS(app)
 @app.route('/drinks')
 def get_drinks():
     '''
-    Get all drinks from the Database.
+    Get all drinks in short format representation from the Database.
     
     :returns: status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
@@ -39,13 +39,25 @@ def get_drinks():
 
 
 '''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+@TODO
+    it should require the 'get:drinks-detail' permission
+    it should contain the drink.long() data representation
 '''
+app.route('/drinks-detail')
+def get_drinks_detail():
+    '''
+    Get all drinks in long format representation from the Database.
+    
+    :returns: status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+        or appropriate status code indicating reason for failure.
+    '''
+    drinks = Drink.query.all()
+    drinks_formatted = [drink.long() for drink in drinks]
+    
+    return jsonify({
+        'success': True,
+        'drinks': drinks_formatted
+    })
 
 
 '''
