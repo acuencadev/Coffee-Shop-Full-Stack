@@ -77,7 +77,7 @@ def create_drink():
     try:
         title = data['title']
         recipe = data['recipe']
-    except:
+    except KeyError:
         abort(400)
 
     if not title or not recipe:
