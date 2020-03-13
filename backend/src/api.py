@@ -38,12 +38,8 @@ def get_drinks():
     })
 
 
-'''
-@TODO
-    it should require the 'get:drinks-detail' permission
-    it should contain the drink.long() data representation
-'''
-app.route('/drinks-detail')
+@app.route('/drinks-detail')
+@requires_auth('get:drinks-detail')
 def get_drinks_detail():
     '''
     Get all drinks in long format representation from the Database.
@@ -60,11 +56,8 @@ def get_drinks_detail():
     })
 
 
-'''
-@TODO
-    it should require the 'post:drinks' permission
-'''
 @app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
 def create_drink():
     '''
     Create a new drink in the drinks table.
@@ -96,11 +89,8 @@ def create_drink():
     })
 
 
-'''
-@TODO 
-    it should require the 'patch:drinks' permission
-'''
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
 def update_drink(drink_id):
     '''
     Updates the drink if it exists, otherwise returns a 404 error.
@@ -136,11 +126,8 @@ def update_drink(drink_id):
     })
 
 
-'''
-@TODO
-    it should require the 'delete:drinks' permission
-'''
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
 def delete_drink(drink_id):
     '''
     Deletes the drink if it exists, otherwise returns a 404 error.
