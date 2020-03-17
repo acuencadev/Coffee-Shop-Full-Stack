@@ -59,7 +59,7 @@ def check_permissions(permission, payload):
         abort(400)
     
     if permission not in payload['permissions']:
-        raise AuthError('Not authorized')
+        raise AuthError('Not authorized', 401)
 
     return True
 
@@ -122,14 +122,17 @@ def requires_auth(permissions=''):
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            token = get_token_auth_header()
             try:
+                token = get_token_auth_header()
                 payload = verify_decode_jwt(token)
             except:
                 abort(401)
-                
-            check_permissions(permissions, payload)
-                
+            
+            try:
+                check_permissions(permissions, payload)
+            except AuthError:
+                abort(401)
+
             return f(payload, *args, **kwargs)
 
         return wrapper

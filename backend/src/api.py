@@ -13,7 +13,6 @@ CORS(app)
 
 
 '''
-@TODO uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
@@ -77,6 +76,7 @@ def create_drink(jwt):
         abort(400)
 
     recipe = json.dumps(recipe)
+    
     new_drink = Drink(title=title, recipe=recipe)
 
     try:
@@ -101,31 +101,30 @@ def update_drink(jwt, drink_id):
         or appropriate status code indicating reason for failure
     '''
     drink = Drink.query.get(drink_id)
-    
+
     if not drink:
         abort(404)
-        
+
     data = request.get_json()
-    
+
     try:
         title = data['title']
-        recipe = data['recipe']
     except KeyError:
         abort(400)
 
-    if not title or not recipe:
+    if not title:
         abort(400)
 
     try:
-        recipe = json.dumps(recipe)
-        
         drink.title = title
-        drink.recipe = recipe
-        
+
+        if 'recipe' in data:
+            drink.recipe = json.dumps(data['recipe'])
+
         drink.update()
     except:
         abort(400)
-        
+
     return jsonify({
         'success': True,
         'drinks': [drink.long()]
