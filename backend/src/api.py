@@ -19,18 +19,19 @@ CORS(app)
 # db_drop_and_create_all()
 
 
-## ROUTES
+# ROUTES
 @app.route('/drinks')
 def get_drinks():
     '''
     Get all drinks in short format representation from the Database.
-    
-    :returns: status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+
+    :returns: status code 200 and json {"success": True, "drinks": drinks}
+        where drinks is the list of drinks or appropriatestatus code
+        indicating reason for failure
     '''
     drinks = Drink.query.all()
     drinks_formatted = [drink.short() for drink in drinks]
-    
+
     return jsonify({
         'success': True,
         'drinks': drinks_formatted
@@ -42,13 +43,14 @@ def get_drinks():
 def get_drinks_detail(jwt):
     '''
     Get all drinks in long format representation from the Database.
-    
-    :returns: status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure.
+
+    :returns: status code 200 and json {"success": True, "drinks": drinks}
+        where drinks is the list of drinks or appropriate status code
+        indicating reason for failure.
     '''
     drinks = Drink.query.all()
     drinks_formatted = [drink.long() for drink in drinks]
-    
+
     return jsonify({
         'success': True,
         'drinks': drinks_formatted
@@ -60,9 +62,10 @@ def get_drinks_detail(jwt):
 def create_drink(jwt):
     '''
     Create a new drink in the drinks table.
-    
-    :returns: status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
+
+    :returns: status code 200 and json {"success": True, "drinks": drink} where
+        drink an array containing only the newly created drink or appropriate
+        status code indicating reason for failure
     '''
     data = request.get_json()
 
@@ -76,12 +79,12 @@ def create_drink(jwt):
         abort(400)
 
     recipe = json.dumps(recipe)
-    
+
     new_drink = Drink(title=title, recipe=recipe)
 
     try:
         new_drink.insert()
-    except:
+    except exc.SQLAlchemyError:
         abort(400)
 
     return jsonify({
@@ -95,10 +98,11 @@ def create_drink(jwt):
 def update_drink(jwt, drink_id):
     '''
     Updates the drink if it exists, otherwise returns a 404 error.
-    
+
     :param drink_id: Existing drink model id.
-    :returns: status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
+    :returns: status code 200 and json {"success": True, "drinks": drink} where
+        drink an array containing only the updated drink or appropriate status
+        code indicating reason for failure
     '''
     drink = Drink.query.get(drink_id)
 
@@ -115,14 +119,14 @@ def update_drink(jwt, drink_id):
     if not title:
         abort(400)
 
+    drink.title = title
+
+    if 'recipe' in data:
+        drink.recipe = json.dumps(data['recipe'])
+
     try:
-        drink.title = title
-
-        if 'recipe' in data:
-            drink.recipe = json.dumps(data['recipe'])
-
         drink.update()
-    except:
+    except exc.SQLAlchemyError:
         abort(400)
 
     return jsonify({
@@ -136,25 +140,26 @@ def update_drink(jwt, drink_id):
 def delete_drink(jwt, drink_id):
     '''
     Deletes the drink if it exists, otherwise returns a 404 error.
-    
+
     :param drink_id: Existing drink model id.
-    :returns: status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
+    :returns: status code 200 and json {"success": True, "delete": id} where
+        id is the id of the deleted record or appropriate status code
+        indicating reason for failure
     '''
     drink = Drink.query.get(drink_id)
-    
+
     if not drink:
         abort(404)
-    
+
     drink.delete()
-    
+
     return jsonify({
         'success': True,
         'delete': drink_id
     })
 
 
-## Error Handling
+# Error Handling
 @app.errorhandler(400)
 def bad_request(error):
     return jsonify({
@@ -180,6 +185,7 @@ def forbidden(error):
         'error': 403,
         'message': "Forbidden"
     }), 403
+
 
 @app.errorhandler(404)
 def not_found(error):
