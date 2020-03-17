@@ -40,7 +40,7 @@ def get_drinks():
 
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
-def get_drinks_detail():
+def get_drinks_detail(jwt):
     '''
     Get all drinks in long format representation from the Database.
     
@@ -58,7 +58,7 @@ def get_drinks_detail():
 
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink():
+def create_drink(jwt):
     '''
     Create a new drink in the drinks table.
     
@@ -75,7 +75,8 @@ def create_drink():
 
     if not title or not recipe:
         abort(400)
-    
+
+    recipe = json.dumps(recipe)
     new_drink = Drink(title=title, recipe=recipe)
 
     try:
@@ -91,7 +92,7 @@ def create_drink():
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def update_drink(drink_id):
+def update_drink(jwt, drink_id):
     '''
     Updates the drink if it exists, otherwise returns a 404 error.
     
@@ -111,8 +112,13 @@ def update_drink(drink_id):
         recipe = data['recipe']
     except KeyError:
         abort(400)
-        
+
+    if not title or not recipe:
+        abort(400)
+
     try:
+        recipe = json.dumps(recipe)
+        
         drink.title = title
         drink.recipe = recipe
         
@@ -128,7 +134,7 @@ def update_drink(drink_id):
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(drink_id):
+def delete_drink(jwt, drink_id):
     '''
     Deletes the drink if it exists, otherwise returns a 404 error.
     
