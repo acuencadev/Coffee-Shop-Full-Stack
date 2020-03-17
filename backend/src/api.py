@@ -151,7 +151,10 @@ def delete_drink(jwt, drink_id):
     if not drink:
         abort(404)
 
-    drink.delete()
+    try:
+        drink.delete()
+    except exc.SQLAlchemyError:
+        abort(400)
 
     return jsonify({
         'success': True,
