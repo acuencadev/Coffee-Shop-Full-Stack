@@ -9,18 +9,20 @@ AUTH0_DOMAIN = 'dev-on139kbu.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'coffee-shop'
 
-## AuthError Exception
-'''
-AuthError Exception
-A standardized way to communicate auth failure modes
-'''
+
+# AuthError Exception
 class AuthError(Exception):
+    '''
+    AuthError Exception
+    A standardized way to communicate auth failure modes
+    '''
+
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
 
 
-## Auth Header
+# Auth Header
 def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """
@@ -57,7 +59,7 @@ def get_token_auth_header():
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
         abort(400)
-    
+
     if permission not in payload['permissions']:
         raise AuthError('Not authorized', 401)
 
@@ -105,7 +107,8 @@ def verify_decode_jwt(token):
         except jwt.JWTClaimsError:
             raise AuthError({
                 'code': 'invalid_claims',
-                'description': 'Incorrect claims. Please, check the audience and issuer.'
+                'description': 'Incorrect claims.'
+                'Please, check the audience and issuer.'
             }, 401)
         except Exception:
             raise AuthError({
@@ -125,9 +128,9 @@ def requires_auth(permissions=''):
             try:
                 token = get_token_auth_header()
                 payload = verify_decode_jwt(token)
-            except:
+            except AuthError:
                 abort(401)
-            
+
             try:
                 check_permissions(permissions, payload)
             except AuthError:
@@ -136,5 +139,5 @@ def requires_auth(permissions=''):
             return f(payload, *args, **kwargs)
 
         return wrapper
-    
+
     return requires_auth_decorator
